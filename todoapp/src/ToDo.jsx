@@ -2,6 +2,9 @@ import logo from "./logo.svg";
 //CSSを読み込む
 import "./App.css";
 import { useState } from "react";
+import { InputTodo } from "./components/InputTodo";
+import { IncompleteTodos } from "./components/IncompleteTodos";
+import { BackTodo } from "./components/BackTodo";
 
 export const ToDo = () => {
   const [todoText, setTodoText] = useState("");
@@ -53,56 +56,26 @@ export const ToDo = () => {
     setIncompleteTodos(newIncompleteTodos);
   };
 
+  const isMaxLimitIncompleteTodos = incompleteTodos.length >= 5;
+
   return (
-    <>T
-      <div className="input-area">
-        <input
-          placeholder="ToDoを入力"
-          value={todoText}
-          onChange={onChangeText}
-        ></input>
-        <button onClick={addTodo}>追加</button>
-      </div>
-      <div className="incomplete-area">
-        <p className="title">未完了のToDo</p>
-        <ul>
-          {/* 受け取った内容を表示する */}
-          {incompleteTodos.map((todos, index) => {
-            //returnを削除しても動作する
-            return (
-              // 一意に判別できる値をkeyにする
-              <li key={todos}>
-                <div className="list-row">
-                  <p>{todos}</p>
-                  <button onClick={() => completeTodo(index)}>完了</button>
-                  {/* 
-                  deleteTodo(index)のように引数を設定してしまうと、ループ分関数が実行されてしまう
-                  →ボタンを押下時に関すを実行するようにする 
-                  関数を生成して、その中で関数を実行するように修正
-                  */}
-                  <button onClick={() => deleteTodo(index)}>削除</button>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-      <div className="complete-area">
-        <p className="title">完了のToDo</p>
-        <ul>
-          {completeTodos.map((completeTodos, index) => {
-            return (
-              <li key={completeTodos}>
-                <div className="list-row">
-                  <p>{completeTodos}</p>
-                  <button onClick={() => backTodo(index)}>戻す</button>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-      ï
+    <>
+      <InputTodo
+        todoText={todoText}
+        onChange={onChangeText}
+        onClick={addTodo}
+        disabled={isMaxLimitIncompleteTodos}
+      ></InputTodo>
+      {/* 未完了のタスクが5個以上の場合、エラーメッセージを表示 */}
+      {isMaxLimitIncompleteTodos && (
+        <p style={{ color: "red" }}>登録できるToDoは5個までです。</p>
+      )}
+      <IncompleteTodos
+        incompleteTodos={incompleteTodos}
+        completeTodo={completeTodo}
+        deleteTodo={deleteTodo}
+      ></IncompleteTodos>
+      <BackTodo completeTodos={completeTodos} backTodo={backTodo}></BackTodo>
     </>
   );
 };
